@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0D0F0C" />
   <title>Clinton — Portfolio</title>
 
@@ -39,7 +39,12 @@
     }
 
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html{
+      scroll-behavior:smooth;
+      background: var(--bg);
+      color-scheme: dark;
+      overscroll-behavior: none; /* prevents white flash on most browsers */
+    }
     body{
       margin:0;
       font-family: var(--serif);
@@ -47,9 +52,29 @@
       color: var(--text);
       overflow-x:hidden;
       min-height:100vh;
+      -webkit-tap-highlight-color: transparent;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg); /* prevents white on rubber band */
     }
+
     a{color:inherit; text-decoration:none}
     main{position:relative; z-index:1}
+
+    /* smooth + avoid layout jank while images/iframes load */
+    img, iframe { display:block; max-width:100% }
+    @supports (content-visibility: auto){
+      section, footer{
+        content-visibility: auto;
+        contain-intrinsic-size: 900px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto}
+      *{animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration:.01ms !important}
+    }
 
     /* =========================
        GLOBAL LIQUID BACKGROUND
@@ -60,6 +85,7 @@
       z-index:0;
       pointer-events:none;
       transform: translateZ(0);
+      will-change: transform;
     }
     .bgStage::after{
       content:"";
@@ -81,6 +107,7 @@
           rgba(255,240,1,.07), transparent 64%);
       opacity:.85;
       filter: saturate(1.05);
+      will-change: opacity;
     }
 
     .bg-loader{
@@ -94,7 +121,8 @@
       z-index:0;
       opacity:.70;
       mix-blend-mode: screen;
-      filter: blur(.15px);
+      /* reduce expensive blur on mobile */
+      filter: none;
     }
     .bg-loader .box{
       position:absolute;
@@ -127,6 +155,7 @@
       opacity:.78;
       filter: url(#goo2);
       will-change: transform;
+      transform: translate3d(0,0,0);
     }
     .wb1{
       left: -14%;
@@ -162,7 +191,13 @@
       opacity:.48;
     }
 
-    /* click ripples */
+    /* MOBILE PERF: turn off goo filter (very expensive) */
+    @media (max-width: 760px){
+      .waveBlob{ filter:none; opacity:.55 }
+      .bgStage{ inset:-120px }
+    }
+
+    /* click ripples (only on intentional taps/clicks) */
     .clickRipples{
       position:fixed;
       inset:0;
@@ -249,6 +284,7 @@
       user-select:none;
       position:relative;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation; /* avoid delay; still allows scroll elsewhere */
     }
     .navBtn:hover{
       transform: translateY(-2px);
@@ -352,7 +388,7 @@
       line-height: 1.55;
     }
 
-    /* hero portrait: small, centered, full image, glass 3D container */
+    /* hero portrait */
     .heroPortrait{
       width: min(360px, 78vw);
       margin: 26px auto 18px;
@@ -370,6 +406,7 @@
       transform: perspective(900px) rotateX(6deg);
       transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
       will-change: transform;
+      touch-action: manipulation;
     }
     .heroPortrait::before{
       content:"";
@@ -391,9 +428,9 @@
     }
     .heroPortrait img{
       width:100%;
-      height:auto;         /* full image (no crop) */
+      height:auto;
       display:block;
-      object-fit: contain; /* keep full face */
+      object-fit: contain;
       background: rgba(0,0,0,.25);
       transform: scale(1.02);
       filter: saturate(.98) contrast(1.05);
@@ -409,7 +446,6 @@
         0 0 80px rgba(255,240,1,.10);
     }
 
-    /* subtle animated micro-section under portrait */
     .heroBadges{
       display:flex;
       gap: 10px;
@@ -427,6 +463,7 @@
       box-shadow: 0 18px 60px rgba(0,0,0,.25);
       position:relative;
       overflow:hidden;
+      touch-action: manipulation;
     }
     .badge::before{
       content:"";
@@ -440,7 +477,6 @@
 
     .ctaRow{ display:flex; gap: 12px; justify-content:center; flex-wrap:wrap; margin-top: 18px; }
 
-    /* wide button */
     .btn{
       position:relative;
       display:inline-flex;
@@ -465,6 +501,7 @@
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
       -webkit-tap-highlight-color: transparent;
       user-select:none;
+      touch-action: manipulation; /* prevents scroll-triggered weird taps */
     }
     .btn svg{ width:22px; fill: currentColor; z-index:3; transition: transform .35s ease, opacity .35s ease; position:relative; }
     .btn .arr-2{ opacity:0; transform: translateX(-10px); }
@@ -508,7 +545,6 @@
     }
     .btnPrimary:hover{ color: var(--bg); }
 
-    /* section head */
     .sectionHead{
       width:min(980px, calc(100% - 40px));
       margin: 0 auto 18px;
@@ -540,6 +576,7 @@
       padding: 22px;
       position:relative;
       overflow:hidden;
+      touch-action: manipulation;
     }
     .panel::after{
       content:"";
@@ -551,7 +588,6 @@
     }
     .panel:hover::after{opacity:1}
 
-    /* animated mini divider section */
     .divider{
       width:min(980px, calc(100% - 40px));
       margin: 18px auto 0;
@@ -567,6 +603,7 @@
       align-items:center;
       overflow:hidden;
       position:relative;
+      touch-action: manipulation;
     }
     .divider::before{
       content:"";
@@ -612,6 +649,7 @@
       position:relative;
       overflow:hidden;
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      touch-action: manipulation;
     }
     .skill::before{
       content:"";
@@ -643,7 +681,7 @@
     .skill h3{margin: 10px 0 6px; font-family: var(--serif2); color: rgba(244,241,200,.92); font-size: 20px}
     .skill p{margin:0; color: rgba(244,241,200,.55); font-size: 15px; line-height:1.45}
 
-    /* projects with "sneak peek" from web links (iframe) */
+    /* projects */
     .projGrid{
       width:min(980px, calc(100% - 40px));
       margin: 20px auto 0;
@@ -662,6 +700,7 @@
       -webkit-backdrop-filter: blur(14px);
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
       position:relative;
+      touch-action: manipulation;
     }
     .proj:hover{
       transform: translateY(-4px);
@@ -696,15 +735,14 @@
       z-index:2;
     }
     .peekFrame iframe{
-      width: 1600px;   /* big virtual canvas */
+      width: 1600px;
       height: 1000px;
       border:0;
       transform-origin: top left;
-      transform: scale(.28); /* scale down into sneak peek */
+      transform: scale(.28);
       filter: saturate(.95) contrast(1.05);
       background:#000;
     }
-    /* fallback if iframes blocked by X-Frame-Options */
     .peekFallback{
       position:absolute;
       inset:12px;
@@ -753,6 +791,7 @@
       display:grid; place-items:center;
       box-shadow: 0 18px 60px rgba(0,0,0,.45);
       transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      touch-action: manipulation;
     }
     .social:hover{
       transform: translateY(-2px);
@@ -793,7 +832,7 @@
     <div class="waveBlob wb4" id="wb4"></div>
   </div>
 
-  <!-- interactive click ripples -->
+  <!-- click ripples (intentional taps only) -->
   <div class="clickRipples" id="clickRipples" aria-hidden="true"></div>
 
   <div class="grain"></div>
@@ -882,9 +921,8 @@
             with glass panels, subtle glow, and smooth motion. My style is premium, but my code stays clean and fast.
           </p>
 
-          <!-- NEW: centered glass 3D portrait -->
           <div class="heroPortrait">
-            <img src="assets/profilepic.jpeg" alt="Clinton portrait" />
+            <img src="assets/profilepic.jpeg" alt="Clinton portrait" loading="eager" decoding="async" />
           </div>
 
           <div class="heroBadges">
@@ -969,19 +1007,21 @@
         <div class="sectionHead reveal">
           <h2><span class="toneA">The hall</span><br><span class="toneB">of fame.</span></h2>
           <p>
-            These previews try to load your real sites directly inside the cards.
-            If a site blocks embedding, it will show a clean fallback with a “Open website” button.
+            These previews load only when the card enters view (to remove lag).
+            If a site blocks embedding, you’ll see a clean fallback with an “Open website” button.
           </p>
         </div>
 
         <div class="projGrid">
-          <!-- Edit: put your real website links in data-url and the buttons -->
           <article class="proj reveal" data-url="https://example.com">
             <div class="peekWrap">
               <div class="projTag">Live Preview</div>
 
               <div class="peekFrame">
-                <iframe loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-forms allow-same-origin allow-popups" src="https://example.com"></iframe>
+                <!-- IMPORTANT: src is lazy injected for performance -->
+                <iframe loading="lazy" referrerpolicy="no-referrer"
+                  sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+                  src="about:blank" data-src="https://example.com"></iframe>
               </div>
 
               <div class="peekFallback">
@@ -1010,7 +1050,9 @@
               <div class="projTag">Sneak Peek</div>
 
               <div class="peekFrame">
-                <iframe loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-forms allow-same-origin allow-popups" src="https://example.org"></iframe>
+                <iframe loading="lazy" referrerpolicy="no-referrer"
+                  sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+                  src="about:blank" data-src="https://example.org"></iframe>
               </div>
 
               <div class="peekFallback">
@@ -1089,7 +1131,7 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // reveal
+    // reveal (fast, no thrash)
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("show"); });
     }, {threshold: 0.12});
@@ -1102,7 +1144,7 @@
         const sel = btn.getAttribute("data-target");
         const el = document.querySelector(sel);
         if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
-      });
+      }, {passive:true});
     });
 
     const sections = ["#home","#about","#skills","#projects","#contact"].map(s=>document.querySelector(s)).filter(Boolean);
@@ -1117,7 +1159,7 @@
     }, {rootMargin:"-45% 0px -50% 0px", threshold:0.01});
     sections.forEach(s=>spy.observe(s));
 
-    // long-press tooltips for mobile (hold 350ms)
+    // long-press tooltips for mobile (hold 350ms) - does NOT interfere with scrolling
     let holdTimer = null;
     navBtns.forEach(btn=>{
       const show = ()=>btn.classList.add("showTip");
@@ -1136,7 +1178,8 @@
       });
     });
 
-    // cursor glow for cards
+    // pointer glow for cards (ONLY on fine pointers; touch = no lag)
+    const isFinePointer = matchMedia("(pointer:fine)").matches;
     const glow = (el, e)=>{
       const r = el.getBoundingClientRect();
       const mx = ((e.clientX - r.left) / r.width) * 100;
@@ -1144,11 +1187,13 @@
       el.style.setProperty("--mx", mx + "%");
       el.style.setProperty("--my", my + "%");
     };
-    document.querySelectorAll(".panel, .skill, .proj, .frame, .divider, .badge").forEach(card=>{
-      card.addEventListener("mousemove", (e)=>glow(card, e));
-    });
+    if(isFinePointer){
+      document.querySelectorAll(".panel, .skill, .proj, .frame, .divider, .badge").forEach(card=>{
+        card.addEventListener("pointermove", (e)=>glow(card, e), {passive:true});
+      });
+    }
 
-    // GLOBAL BACKGROUND animation (calm)
+    // GLOBAL BACKGROUND animation (throttled on mobile)
     const bgGlass = document.getElementById("bgGlass");
     const wb1 = document.getElementById("wb1");
     const wb2 = document.getElementById("wb2");
@@ -1156,19 +1201,26 @@
     const wb4 = document.getElementById("wb4");
     const bgStage = document.getElementById("bgStage");
 
-    let mouseX = 0.5, mouseY = 0.5;
-    window.addEventListener("mousemove", (e)=>{
-      mouseX = e.clientX / window.innerWidth;
-      mouseY = e.clientY / window.innerHeight;
-      if(bgGlass){
-        bgGlass.style.setProperty("--mx", (mouseX*100).toFixed(2) + "%");
-        bgGlass.style.setProperty("--my", (mouseY*100).toFixed(2) + "%");
-      }
-    }, {passive:true});
+    const isMobile = matchMedia("(max-width: 760px)").matches;
+    const prefersReduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // CLICK ripple + boost
+    let mouseX = 0.5, mouseY = 0.5;
+    if(isFinePointer){
+      window.addEventListener("pointermove", (e)=>{
+        if(e.pointerType !== "mouse") return;
+        mouseX = e.clientX / window.innerWidth;
+        mouseY = e.clientY / window.innerHeight;
+        if(bgGlass){
+          bgGlass.style.setProperty("--mx", (mouseX*100).toFixed(2) + "%");
+          bgGlass.style.setProperty("--my", (mouseY*100).toFixed(2) + "%");
+        }
+      }, {passive:true});
+    }
+
+    // CLICK ripple: only for intentional taps/clicks on interactive elements (NOT scrolling)
     const clickRipples = document.getElementById("clickRipples");
     let clickBoost = 0;
+
     const addPulse = (x, y)=>{
       const p = document.createElement("div");
       p.className = "pulse";
@@ -1177,16 +1229,69 @@
       clickRipples.appendChild(p);
       p.addEventListener("animationend", ()=> p.remove(), {once:true});
     };
+
+    const INTERACTIVE_SELECTOR = ".btn, .navBtn, .panel, .skill, .proj, .divider, .badge, .social, a";
+    const isInteractive = (target)=> !!target.closest(INTERACTIVE_SELECTOR);
+
+    let downX = 0, downY = 0, tracking = false, moved = false;
+
     window.addEventListener("pointerdown", (e)=>{
+      // only react to intentional taps/clicks on interactive elements
+      if(!isInteractive(e.target)) return;
+
+      tracking = true;
+      moved = false;
+      downX = e.clientX;
+      downY = e.clientY;
+    }, {passive:true});
+
+    window.addEventListener("pointermove", (e)=>{
+      if(!tracking) return;
+      const dx = e.clientX - downX;
+      const dy = e.clientY - downY;
+      if((dx*dx + dy*dy) > 16*16) moved = true; // user is dragging/scrolling
+    }, {passive:true});
+
+    window.addEventListener("pointerup", (e)=>{
+      if(!tracking) return;
+      tracking = false;
+
+      // if user dragged (scroll), do nothing (no ripple)
+      if(moved) return;
+
+      // still ensure it's interactive
+      if(!isInteractive(e.target)) return;
+
       clickBoost = 1;
       addPulse(e.clientX, e.clientY);
     }, {passive:true});
 
+    // background motion loop (pause when hidden, throttle on mobile)
     const lerp = (a,b,t)=>a+(b-a)*t;
     let t = 0;
     let x1=0,y1=0,x2=0,y2=0,x3=0,y3=0,x4=0,y4=0;
 
-    function animate(){
+    let running = !prefersReduce;
+    document.addEventListener("visibilitychange", ()=>{
+      running = !document.hidden && !prefersReduce;
+    });
+
+    let last = 0;
+    const targetFPS = isMobile ? 30 : 60;
+    const frameMS = 1000 / targetFPS;
+
+    function animate(ts){
+      if(!running){
+        requestAnimationFrame(animate);
+        return;
+      }
+
+      if(ts - last < frameMS){
+        requestAnimationFrame(animate);
+        return;
+      }
+      last = ts;
+
       t += 0.0062;
       clickBoost = Math.max(0, clickBoost - 0.03);
 
@@ -1224,38 +1329,53 @@
       if(wb3) wb3.style.transform = `translate3d(${x3}px, ${y3}px, 0)`;
       if(wb4) wb4.style.transform = `translate3d(${x4}px, ${y4}px, 0)`;
 
-      if(bgStage){
+      if(bgStage && !isMobile){
         const rx = (0.5 - mouseY) * (3.8 + clickBoost*1.4);
         const ry = (mouseX - 0.5) * (3.8 + clickBoost*1.4);
         bgStage.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }else if(bgStage && isMobile){
+        // keep stable on mobile (less work, smoother scroll)
+        bgStage.style.transform = `translateZ(0)`;
       }
 
       requestAnimationFrame(animate);
     }
-    animate();
+    requestAnimationFrame(animate);
 
-    // PROJECT PREVIEW fallback:
-    // If iframe errors / blocks, we show fallback after a short delay.
-    // (Many sites set X-Frame-Options / CSP frame-ancestors and won't render.)
-    document.querySelectorAll(".proj").forEach(card=>{
-      const iframe = card.querySelector("iframe");
-      const fallback = card.querySelector(".peekFallback");
-      if(!iframe || !fallback) return;
+    // PROJECT PREVIEW: load iframe only when card enters view (removes heavy initial lag)
+    const projCards = document.querySelectorAll(".proj");
+    const iframeLoader = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        const card = entry.target;
+        const iframe = card.querySelector("iframe");
+        if(!iframe) return;
 
-      let loaded = false;
-      const timer = setTimeout(()=>{
-        if(!loaded){
-          // likely blocked
-          iframe.closest(".peekFrame").style.display = "none";
-          fallback.style.display = "flex";
+        const src = iframe.getAttribute("data-src");
+        if(src && iframe.src === "about:blank"){
+          iframe.src = src;
+          // fallback if blocked
+          const fallback = card.querySelector(".peekFallback");
+          const frame = iframe.closest(".peekFrame");
+          let loaded = false;
+
+          const timer = setTimeout(()=>{
+            if(!loaded){
+              if(frame) frame.style.display = "none";
+              if(fallback) fallback.style.display = "flex";
+            }
+          }, 1800);
+
+          iframe.addEventListener("load", ()=>{
+            loaded = true;
+            clearTimeout(timer);
+          }, {once:true});
         }
-      }, 1600);
 
-      iframe.addEventListener("load", ()=>{
-        loaded = true;
-        clearTimeout(timer);
-      }, {once:true});
-    });
+        iframeLoader.unobserve(card);
+      });
+    }, {threshold: 0.15, rootMargin: "200px 0px"});
+    projCards.forEach(c=>iframeLoader.observe(c));
   </script>
 </body>
 </html>
